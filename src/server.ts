@@ -1,13 +1,12 @@
 import { Hono } from "hono";
-////const app = new Hono();
-
+import { serveStatic } from "hono/cloudflare-workers";
 type Bindings = {
   ORIGIN_SERVER: string;
   PINK_ELEPHANTS: KVNamespace;
 };
 const app = new Hono<{ Bindings: Bindings }>();
-
-//todo
+app.use('/static/*', serveStatic({ root: './' }))
+app.use('/favicon.svg', serveStatic({ path: './favicon.svg' }))
 // 1. extract req url
 // 2. calculate hash of the req url
 // 3. look up KV value with hash as key
@@ -69,9 +68,6 @@ async function readKVFirst(context, redir) {
   }
 }
 
-app.get("/static/*", async (ctx) => {
-  return await ctx.env.ASSETS.fetch(ctx.req);
-});
 app.get("/voyage", async (ctx) => {
   let redir = "https://" + ctx.env.ORIGIN_SERVER + ctx.req.path;
   return await readKVFirst(ctx, redir);
@@ -95,6 +91,5 @@ app.get("/", async (ctx) => {
 });
 
 
-////app.route("/", peop);
 export default app;
 
