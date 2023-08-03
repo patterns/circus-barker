@@ -1,12 +1,11 @@
-import { Hono } from "hono";
-import { serveStatic } from "hono/cloudflare-workers";
+import { Hono } from 'hono'
 type Bindings = {
-  ORIGIN_SERVER: string;
-  PINK_ELEPHANTS: KVNamespace;
-};
-const app = new Hono<{ Bindings: Bindings }>();
-app.use('/static/*', serveStatic({ root: './' }))
-app.use('/favicon.svg', serveStatic({ path: './favicon.svg' }))
+  ORIGIN_SERVER: string
+  PINK_ELEPHANTS: KVNamespace
+}
+const app = new Hono<{ Bindings: Bindings }>()
+app.get('/static/*', (c) => c.redirect('./assets' + c.req.path))
+app.get('/favicon.svg', (c) => c.redirect('./assets/favicon.svg'))
 // 1. extract req url
 // 2. calculate hash of the req url
 // 3. look up KV value with hash as key
