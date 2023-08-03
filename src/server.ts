@@ -2,8 +2,8 @@ import { Hono } from "hono";
 ////const app = new Hono();
 
 type Bindings = {
-  ORIGIN_SERVER: string
-  PINK_ELEPHANTS: KVNamespace
+  ORIGIN_SERVER: string;
+  PINK_ELEPHANTS: KVNamespace;
 };
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -31,7 +31,7 @@ async function readKVFirst(context, redir) {
     }
     return response.text();
   }
-
+  // TODO refactor step as middleware
   try {
 
     // TypeError exception is thrown on invalid URLs
@@ -73,13 +73,22 @@ app.get("/static/*", async (ctx) => {
   return await ctx.env.ASSETS.fetch(ctx.req);
 });
 app.get("/voyage", async (ctx) => {
-  let redir = "https://" + ctx.env.ORIGIN_SERVER + "/voyage";
+  let redir = "https://" + ctx.env.ORIGIN_SERVER + ctx.req.path;
   return await readKVFirst(ctx, redir);
 });
 app.get("/tabla", async (ctx) => {
-  let redir = "https://" + ctx.env.ORIGIN_SERVER + "/tabla";
+  let redir = "https://" + ctx.env.ORIGIN_SERVER + ctx.req.path;
   return await readKVFirst(ctx, redir);
 });
+app.get("/blurb/*", async (ctx) => {
+  let redir = "https://" + ctx.env.ORIGIN_SERVER + ctx.req.path;
+  return await readKVFirst(ctx, redir);
+});
+app.get("/table/*", async (ctx) => {
+  let redir = "https://" + ctx.env.ORIGIN_SERVER + ctx.req.path;
+  return await readKVFirst(ctx, redir);
+});
+
 app.get("/", async (ctx) => {
   let redir = "https://" + ctx.env.ORIGIN_SERVER;
   return await readKVFirst(ctx, redir);
