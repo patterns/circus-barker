@@ -1,0 +1,19 @@
+{
+  "name": "circus-barker",
+  "version": "0.1.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild --bundle src/server.js --format=esm --outfile=dist/_worker.js",
+    "deploy": "wrangler pages publish dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "hono": "^3.3.4"
+  },
+  "devDependencies": {
+    "esbuild": "^0.18.17"
+  }
+}
