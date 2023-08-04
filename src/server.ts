@@ -83,19 +83,12 @@ app.get("/table/*", async (ctx) => {
   return await readKVFirst(ctx, redir);
 });
 
-// TODO mount path to assets
-app.get('/static/*', async (c) => {
-  let redir = "https://" + ctx.env.ORIGIN_SERVER + ctx.req.path;
-    return await fetch(redir, {
-      cf: {cacheTtl: 5, cacheEverything: true},
-    })
-})
-/*
-app.get('/favicon.svg', async (c) => {
-    return await fetch(c.req.path, {
-      cf: {cacheTtl: 5, cacheEverything: true},
-    })
-})*/
+app.get('/static/*', async (ctx) => {
+    return await ctx.env.ASSETS.fetch(ctx.req);
+});
+app.get('/favicon.svg', async (ctx) => {
+    return await ctx.env.ASSETS.fetch(ctx.req);
+});
 
 app.get("/", async (ctx) => {
   let redir = "https://" + ctx.env.ORIGIN_SERVER;
