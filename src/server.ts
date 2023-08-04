@@ -84,10 +84,10 @@ app.get("/table/*", async (ctx) => {
 });
 
 app.get('/static/*', async (ctx) => {
-    return await ctx.env.ASSETS.fetch(ctx.req);
+    return await ctx.env.ASSETS.fetch(ctx.req.path);
 });
 app.get('/favicon.svg', async (ctx) => {
-    return await ctx.env.ASSETS.fetch(ctx.req);
+    return await ctx.env.ASSETS.fetch(ctx.req.path);
 });
 
 app.get("/", async (ctx) => {
