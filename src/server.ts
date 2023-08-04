@@ -4,17 +4,7 @@ type Bindings = {
   PINK_ELEPHANTS: KVNamespace
 }
 const app = new Hono<{ Bindings: Bindings }>()
-/*
-app.get('/static/*', async (c) => {
-    return await fetch(c.req.path, {
-      cf: {cacheTtl: 5, cacheEverything: true},
-    })
-})
-app.get('/favicon.svg', async (c) => {
-    return await fetch(c.req.path, {
-      cf: {cacheTtl: 5, cacheEverything: true},
-    })
-})*/
+
 // 1. extract req url
 // 2. calculate hash of the req url
 // 3. look up KV value with hash as key
@@ -92,6 +82,20 @@ app.get("/table/*", async (ctx) => {
   let redir = "https://" + ctx.env.ORIGIN_SERVER + ctx.req.path;
   return await readKVFirst(ctx, redir);
 });
+
+// TODO mount path to assets
+app.get('/static/*', async (c) => {
+  let redir = "https://" + ctx.env.ORIGIN_SERVER + ctx.req.path;
+    return await fetch(redir, {
+      cf: {cacheTtl: 5, cacheEverything: true},
+    })
+})
+/*
+app.get('/favicon.svg', async (c) => {
+    return await fetch(c.req.path, {
+      cf: {cacheTtl: 5, cacheEverything: true},
+    })
+})*/
 
 app.get("/", async (ctx) => {
   let redir = "https://" + ctx.env.ORIGIN_SERVER;
