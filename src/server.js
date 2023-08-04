@@ -75,7 +75,10 @@ export default {
     if (url.pathname.startsWith('/voyage') ||
         url.pathname.startsWith('/tabla') ||
         url.pathname.startsWith('/blurb') ||
-        url.pathname.startsWith('/table')
+        url.pathname.startsWith('/table') ||
+        url.pathname.startsWith('/well-known/webfinger') ||
+        url.pathname.startsWith('/.well-known/webfinger') ||
+        url.pathname.startsWith('/u/')
         ) {
         let redir = 'https://' + env.ORIGIN_SERVER + url.pathname;
         return readKVFirst(env, redir);
@@ -84,8 +87,16 @@ export default {
         let redir = 'https://' + env.ORIGIN_SERVER;
         return readKVFirst(env, redir);
     }
+/*
+    if ((url.pathname.startsWith('/inbox') || url.pathname.startsWith('/outbox')) &&
+        request.method === "POST"
+        ) {
+        let redir = 'https://' + env.ORIGIN_SERVER;
+        return fetch(reqredir);
+    }*/
 
     // Otherwise, serve static assets.
-    return env.ASSETS.fetch(request);
+    ////return env.ASSETS.fetch(request);
+    return new Response("testing _routes.json");
   },
 }
