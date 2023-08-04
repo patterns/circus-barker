@@ -1,9 +1,4 @@
-import { Hono } from 'hono'
-type Bindings = {
-  ORIGIN_SERVER: string
-  PINK_ELEPHANTS: KVNamespace
-}
-const app = new Hono<{ Bindings: Bindings }>()
+
 
 // 1. extract req url
 // 2. calculate hash of the req url
@@ -13,7 +8,7 @@ const app = new Hono<{ Bindings: Bindings }>()
 // 6. replace any links refering to the origin server
 // 7. save a copy of the content result in KV using expiration of wk
 // 8. return the content result
-async function readKVFirst(context, redir) {
+async function readKVFirst(env, redir) {
 
   /**
    * gatherResponse awaits and returns a response body as a string.
@@ -28,7 +23,7 @@ async function readKVFirst(context, redir) {
     }
     return response.text();
   }
-  // TODO refactor step as middleware
+
   try {
 
     // TypeError exception is thrown on invalid URLs
@@ -40,11 +35,11 @@ async function readKVFirst(context, redir) {
     const internal_seq = btoa(String.fromCharCode(...new Uint8Array(sum)));
 
     // prefer local copy and saving a trip
-    const KV = context.env.PINK_ELEPHANTS;
+    const KV = env.PINK_ELEPHANTS;
     const from_cache = await KV.get(internal_seq);
     if (from_cache != null) {
-      // TODO short-circuit when wrong format from public key (save consumer grief)
-      return context.html(from_cache);
+      // TODO short-circuit when wrong format  (save consumer grief)
+      return new Response(from_cache, { status: 200 });
     }
 
     // retrieve a fresh version (as specified by req url)
@@ -59,42 +54,30 @@ async function readKVFirst(context, redir) {
     await KV.put(internal_seq, results, {expirationTtl: 3600});
 
     // pass back fresh (content) to the consumer
-    return context.html(results);
-
+    return new Response(results, { status: 200 });
   } catch (err) {
-    return new Response('Error parsing JSON content', { status: 400 });
+    return new Response('Error parsing content', { status: 400 });
   }
 }
 
-app.get("/voyage", async (ctx) => {
-  let redir = "https://" + ctx.env.ORIGIN_SERVER + ctx.req.path;
-  return await readKVFirst(ctx, redir);
-});
-app.get("/tabla", async (ctx) => {
-  let redir = "https://" + ctx.env.ORIGIN_SERVER + ctx.req.path;
-  return await readKVFirst(ctx, redir);
-});
-app.get("/blurb/*", async (ctx) => {
-  let redir = "https://" + ctx.env.ORIGIN_SERVER + ctx.req.path;
-  return await readKVFirst(ctx, redir);
-});
-app.get("/table/*", async (ctx) => {
-  let redir = "https://" + ctx.env.ORIGIN_SERVER + ctx.req.path;
-  return await readKVFirst(ctx, redir);
-});
 
-app.get('/static/*', async (ctx) => {
-    return await ctx.env.ASSETS.fetch(ctx.req.path);
-});
-app.get('/favicon.svg', async (ctx) => {
-    return await ctx.env.ASSETS.fetch(ctx.req.path);
-});
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    if (url.pathname.startsWith('/voyage') ||
+        url.pathname.startsWith('/tabla') ||
+        url.pathname.startsWith('/blurb') ||
+        url.pathname.startsWith('/table')
+        ) {
+        let redir = 'https://' + env.ORIGIN_SERVER + url.pathname;
+        return readKVFirst(env, redir);
+    }
+    if (url.pathname === '/' || url.pathname === '') {
+        let redir = 'https://' + env.ORIGIN_SERVER;
+        return readKVFirst(env, redir);
+    }
 
-app.get("/", async (ctx) => {
-  let redir = "https://" + ctx.env.ORIGIN_SERVER;
-  return await readKVFirst(ctx, redir);
-});
-
-
-export default app;
-
+    // Otherwise, serve static assets.
+    return env.ASSETS.fetch(request);
+  },
+}
