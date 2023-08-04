@@ -39,7 +39,11 @@ async function readKVFirst(env, redir) {
     const from_cache = await KV.get(internal_seq);
     if (from_cache != null) {
       // TODO short-circuit when wrong format  (save consumer grief)
-      return new Response(from_cache, { status: 200 });
+      return new Response(from_cache, {
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+        },
+      });
     }
 
     // retrieve a fresh version (as specified by req url)
@@ -54,7 +58,11 @@ async function readKVFirst(env, redir) {
     await KV.put(internal_seq, results, {expirationTtl: 3600});
 
     // pass back fresh (content) to the consumer
-    return new Response(results, { status: 200 });
+    return new Response(results, {
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+        },
+    });
   } catch (err) {
     return new Response('Error parsing content', { status: 400 });
   }
