@@ -23,6 +23,7 @@ jobs:
           mkdir dist
           mv ./assets/* dist/
           mv ./functions dist/
+          mv ./src dist/
 
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1

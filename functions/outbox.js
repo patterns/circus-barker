@@ -1,20 +1,16 @@
-// functions/outbox.js
+// forward POST request to origin 
 
-export default {
-  async fetch(rcv, env) {
-    if (rcv.method !== "POST") {
-      return new Response("Not Implemented", {status: 501});
-    }
+const box = async ({request, env}) => {
     // specify fields on new constructor
     const newRequestInit = {
       redirect: "follow",
     };
     // adjust the destination server
-    const url = new URL(rcv.url);
+    const url = new URL(request.url);
     url.hostname = env.ORIGIN_SERVER;
     const newRequest = new Request(
       url.toString(),
-      new Request(rcv, newRequestInit),
+      new Request(request, newRequestInit),
     );
     try {
       return await fetch(newRequest);
@@ -23,5 +19,6 @@ export default {
         status: 500,
       });
     }
-  },
 };
+export const onRequestPost = [box];
+
