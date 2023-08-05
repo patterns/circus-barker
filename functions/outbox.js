@@ -1,7 +1,9 @@
 // forward POST request to origin 
 
-const box = async ({request, env}) => {
-    // specify fields on new constructor
+export async function onRequestPost(context) {
+  const { request, env } = context;
+  console.log(`RCV POST: ${request.url}`);
+  // specify fields on new constructor
     const newRequestInit = {
       redirect: "follow",
     };
@@ -19,6 +21,6 @@ const box = async ({request, env}) => {
         status: 500,
       });
     }
-};
-export const onRequestPost = [box];
+}
+
 
