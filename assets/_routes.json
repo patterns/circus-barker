@@ -1,8 +1,8 @@
 {
   "version": 1,
   "include": [
-    "/", "/voyage", "/tabla", "/blurb/*", "/table/*", "/inbox", "/outbox",
-    "/u/*", "/.well-known/webfinger", "/well-known/webfinger",
+    "/", "/voyage", "/tabla", "/blurb/*", "/table/*", "/inbox", "/outbox", "/u/*",
+    "/.well-known/webfinger", "/well-known/webfinger", "/%2Ewell-known/webfinger",
   ],
   "exclude": ["/static/*", "/favicon.svg"],
 }
