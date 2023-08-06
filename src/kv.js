@@ -26,7 +26,7 @@ export async function readKVFirst(env, redir) {
       cf: { cacheTtl: 5, cacheEverything: true }
     });
     const results = await gatherResponse(response);
-    await KV.put(internal_seq, results, { expirationTtl: 3600 });
+    await KV.put(internal_seq, results, { expirationTtl: 28800});
     return new Response(results, {
       headers: {
         "Content-Type": "text/html; charset=utf-8"
