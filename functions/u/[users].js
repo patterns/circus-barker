@@ -1,5 +1,5 @@
 // forward GET to origin server unless KV record exists
-import { readKVFirst } from "../src/kv.js"
+import { readKVFirst } from "../../src/kv.js"
 
 export async function onRequestGet(context) {
   const {request, env } = context;
